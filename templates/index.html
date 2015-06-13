@@ -1,0 +1,32 @@
+
+<html>
+  <head>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-title">
+        <h1>Twitch</h1>
+        <p class="lead">{{ .Name }}</p>
+        <form action ="next" method ="POST">
+          streamer:
+          <Input type ="text" name="streamer">
+          <Input type ="submit" value="go">
+        </form>
+        <hr />
+      </div>
+
+<div id="player">
+  <object type="application/x-shockwave-flash" height="378" width="620"   data="//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf" bgcolor="#000000">
+    <param name="allowFullScreen" value="true" />
+    <param name="allowScriptAccess" value="always" />
+        <param name="allowNetworking" value="all" />
+        <param name="movie" value="//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf" />
+  <param name="flashvars" value="channel={{ .Name }}&auto_play=true& start_volume=25" />
+  </object>
+</div>
+
+    </div>
+    <script src="/js/bootstrap.min.js"></script>
+  </body>
+</html>
