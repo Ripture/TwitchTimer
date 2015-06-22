@@ -2,30 +2,44 @@
 <html>
   <head>
     <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+    #rcorners {
+      border-radius: 15px 50px 30px 5px;
+      background: #8AC007;
+      padding: 20px; 
+      width: 200px;
+      height: 150px; 
+    }
+    body {
+      background: #C8C8C8 no-repeat fixed center;
+    }
+
+    h1 {
+      text-shadow: 2px 2px 4px purple;
+    }
+    </style>
   </head>
   <body>
-    <div class="container">
-      <div class="page-title">
-        <h1>Twitch</h1>
-        <p class="lead">{{ .Name }}</p>
-        <form action ="next" method ="POST">
-          streamer:
-          <Input type ="text" name="streamer">
-          <Input type ="submit" value="go">
-        </form>
-        <hr />
+    <div id="background">
+      <div class="container">
+        <div class="page-title">
+          <h1>Twitch</h1>
+          <p class="lead">{{ .Name }}</p>
+          <form action ="next" method ="POST">
+            <Input type ="submit" value="go">
+          </form>
+          <hr />
+        </div>
+
+      <div id="player">
+        <object type="application/x-shockwave-flash" height="378" width="620"   data="//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf" bgcolor="#000000">
+          <param name="allowFullScreen" value="true" />
+          <param name="allowScriptAccess" value="always" />
+          <param name="allowNetworking" value="all" />
+          <param name="movie" value="//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf" />
+          <param name="flashvars" value="channel={{ .Name }}&auto_play=true& start_volume=25" />
+        </object>
       </div>
-
-<div id="player">
-  <object type="application/x-shockwave-flash" height="378" width="620"   data="//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf" bgcolor="#000000">
-    <param name="allowFullScreen" value="true" />
-    <param name="allowScriptAccess" value="always" />
-        <param name="allowNetworking" value="all" />
-        <param name="movie" value="//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf" />
-  <param name="flashvars" value="channel={{ .Name }}&auto_play=true& start_volume=25" />
-  </object>
-</div>
-
     </div>
     <script src="/js/bootstrap.min.js"></script>
   </body>
