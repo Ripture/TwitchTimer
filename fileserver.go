@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"github.com/ripture/TwitchTimer/lib"
 	"html/template"
 	"io/ioutil"
@@ -22,32 +23,84 @@ type Streamer struct {
 	Viewers int
 }
 
+// WHAT THE HELL IS THIS
+//
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin:     func(r *http.Request) bool { return true },
+}
+
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	GetStreams()
-
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", Twitch)
 
-	r.HandleFunc("/next", Next)
+	r.HandleFunc("/requestStreamer", requestStreamer)
 
-	fmt.Println("Starting server on :1935")
+	fmt.Printf("%v: Starting server on :1935\n", time.Now().Format("15:04:05AM"))
 	http.ListenAndServe(":1935", r)
 }
 
+func requestStreamer(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	for {
+		messageType, p, err := conn.ReadMessage()
+		_ = messageType
+		_ = p
+		if err != nil {
+			return
+		}
+
+		msg := string(p[:])
+		// fmt.Println(msg)
+		if msg == "requestStreamer" {
+			fmt.Printf("%v: %v - Requests New Streamer\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr())
+
+			newStreamer := pickStreamer()
+
+			fmt.Printf("%v: %v - Returning New Streamer: %v\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr(), newStreamer)
+
+			err = conn.WriteMessage(messageType, []byte(newStreamer))
+			if err != nil {
+				return
+			}
+		}
+	}
+}
+func print_binary(s []byte) {
+	fmt.Printf("Received b:")
+	for n := 0; n < len(s); n++ {
+		fmt.Printf("%c", s[n])
+	}
+	fmt.Printf("\n")
+}
+
 func Twitch(w http.ResponseWriter, r *http.Request) {
+	// conn, err := upgrader.Upgrade(w, r, nil)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// fmt.Printf("%v: New Connection From %v\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr())
+
 	var ran = rand.Intn(len(StreamerList))
-	fmt.Println("Fetching " + StreamerList[ran].Name)
 	ExeTemplate(StreamerList[ran].Name, StreamerList[ran].Viewers, w, r)
 }
 
-func Next(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Fetching new streamer list...")
+func pickStreamer() string {
+	//fmt.Println("Fetching new streamer list...")
 	GetStreams()
 	var ran = rand.Intn(len(StreamerList))
-	fmt.Println("Fetching " + StreamerList[ran].Name)
-	ExeTemplate(StreamerList[ran].Name, StreamerList[ran].Viewers, w, r)
+	//fmt.Println("Fetching " + StreamerList[ran-1].Name)
+	return StreamerList[ran-1].Name
 }
 
 func ExeTemplate(name string, viewers int, w http.ResponseWriter, r *http.Request) {
@@ -94,7 +147,7 @@ func GetStreams() forms.StreamS {
 	//var skip = SomeStreams.Total - int(float64(SomeStreams.Total)*.05)
 	numt := SomeStreams.Total / 100
 	numm := SomeStreams.Total % 100
-	fmt.Println("Found " + strconv.Itoa(SomeStreams.Total) + " streamers.")
+	fmt.Printf("%v: Found %v streamers\n", time.Now().Format("15:04:05AM"), SomeStreams.Total)
 
 	for i := 0; i < numt; i++ {
 		offset = 100 * i
