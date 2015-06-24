@@ -2,15 +2,33 @@
 <html>
   <head>
     <style>
-    h1 {
-      text-shadow: 2px 2px 4px purple;
-    }
-    body {
-    background: #C8C8C8 no-repeat fixed center;
-    }
+      h1 {text-shadow: 2px 2px 4px purple;}
+      body {background: #C8C8C8 no-repeat fixed center;}
     </style>
+    <script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script>
-    window.onload = new Function("changeChannel('nl_Kripp');");
+      $(function () {
+        window.onPlayerEvent = function (data) {
+          data.forEach(function(event) {
+            if (event.event == "playerInit") {
+              var player = $("#twitch_embed_player")[0];
+              player.playVideo();
+              player.mute();
+            }
+          });
+        }
+
+        swfobject.embedSWF("//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf", "twitch_embed_player", "640", "400", "11", null,
+          { "eventsCallback":"onPlayerEvent",
+            "embed":1,
+            "channel":"nl_Kripp",
+            "auto_play":"true",},
+          { "allowScriptAccess":"always",
+            "allowFullScreen":"true"});
+      });
+
+    // window.onload = new Function("changeChannel('nl_Kripp');");
 
     var counter = 20;
     var counting;
@@ -39,43 +57,24 @@
     }
 
     function changeChannel(name){
-      while (document.getElementById("player").firstChild){
-          document.getElementById("player").removeChild(document.getElementById("player").firstChild);
+      // while (document.getElementById("player").firstChild){
+      //     document.getElementById("player").removeChild(document.getElementById("player").firstChild);
+      // }
+    }
+
+    var hidden = false;
+    function showPlyr(){
+      if (hidden)
+      {
+        $("#twitch_embed_player").show();
+        hidden = false
+        $("#showplr").prop('value', 'hide')
       }
-
-      var newplayer = document.createElement("object");
-      newplayer.type = "application/x-shockwave-flash";
-      newplayer.height = 378;
-      newplayer.width = 620;
-      newplayer.data = "//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf";
-      newplayer.bgcolor = "#000000";
-
-      var paramAllowFullScreen = document.createElement("PARAM");
-      paramAllowFullScreen.name = "allowFullScreen";
-      paramAllowFullScreen.value = "true"
-
-      var paramAllowScriptAccess = document.createElement("PARAM");
-      paramAllowScriptAccess.name = "allowScriptAccess";
-      paramAllowScriptAccess.value = "always";
-
-      var paramAllowNetworking = document.createElement("PARAM");
-      paramAllowNetworking.name = "allowNetworking";
-      paramAllowNetworking.value = "all";
-
-      var paramMovie = document.createElement("PARAM");
-      paramAllowScriptAccess.name = "movie";
-      paramAllowScriptAccess.value = "//www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf";
-
-      var paramFlashvars = document.createElement("PARAM");
-      paramFlashvars.name = "flashvars";
-      paramFlashvars.value = "channel=" + name + "&auto_play=true& start_volume=25";
-
-      newplayer.appendChild(paramAllowFullScreen);
-      newplayer.appendChild(paramAllowScriptAccess);
-      newplayer.appendChild(paramMovie);
-      newplayer.appendChild(paramFlashvars);
-
-      document.getElementById("player").appendChild(newplayer);
+      else{
+        $("#twitch_embed_player").hide();
+        hidden = true
+        $("#showplr").prop('value', 'show')
+      }
     }
 
     //var serversocket = new WebSocket ("ws://70.161.150.36:1935/requestStreamer");
@@ -108,11 +107,12 @@
           </form> -->
 <!--           <input id="sendtext" type="text" onkeydown="if (event.keyCode == 13) {senddata();}" />-->
            <input type="button" id="sendBtn" value="NEXT" onclick="requestStreamer()"></input>
+           <input type="button" id="showplr" value="hide" onclick="showPlyr()"></input>
           <div id="timer">20</div>
           <hr />
         </div>
 
-      <div id="player">
+      <div id="twitch_embed_player">
 
       </div>
     </div>
