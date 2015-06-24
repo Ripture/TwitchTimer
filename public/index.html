@@ -78,8 +78,9 @@
       document.getElementById("player").appendChild(newplayer);
     }
 
-    var serversocket = new WebSocket ("ws://70.161.150.36:1935/requestStreamer");
- 
+    //var serversocket = new WebSocket ("ws://70.161.150.36:1935/requestStreamer");
+    var serversocket = new WebSocket ("ws://localhost:1935/requestStreamer");
+
     // Write message on receive
     serversocket.onmessage = function(e) {
       changeChannel(e.data);

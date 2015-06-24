@@ -15,14 +15,13 @@ import (
 
 var GameList []forms.Games
 var StreamerList []forms.Streamers
+var timeFormatString = "15:04:05AM"
 
 type Streamer struct {
 	Name    string
 	Viewers int
 }
 
-// WHAT THE HELL IS THIS
-//
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
@@ -30,7 +29,9 @@ var upgrader = websocket.Upgrader{
 }
 
 func main() {
+	//seed random with current time
 	rand.Seed(time.Now().UTC().UnixNano())
+
 	GetStreams()
 	r := mux.NewRouter()
 
@@ -39,7 +40,7 @@ func main() {
 	//websocket for requesting more streamers
 	r.HandleFunc("/requestStreamer", requestStreamer)
 
-	fmt.Printf("%v: Starting server on :1935\n", time.Now().Format("15:04:05AM"))
+	fmt.Printf("%v: Starting server on :1935\n", time.Now().Format(timeFormatString))
 	http.ListenAndServe(":1935", r)
 }
 
@@ -51,19 +52,16 @@ func requestStreamer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for {
-		messageType, p, err := conn.ReadMessage()
+		messageType, _, err := conn.ReadMessage()
 		if err != nil {
 			return
 		}
 
-		msg := string(p[:])
-		fmt.Println(msg)
-
-		fmt.Printf("%v: %v - Requests New Streamer\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr())
+		fmt.Printf("%v: %v - Requests New Streamer\n", time.Now().Format(timeFormatString), conn.RemoteAddr())
 
 		newStreamer := pickStreamer()
 
-		fmt.Printf("%v: %v - Returning New Streamer: %v\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr(), newStreamer)
+		fmt.Printf("%v: %v - Returning New Streamer: %v\n", time.Now().Format(timeFormatString), conn.RemoteAddr(), newStreamer)
 
 		err = conn.WriteMessage(messageType, []byte(newStreamer))
 		if err != nil {
@@ -71,13 +69,6 @@ func requestStreamer(w http.ResponseWriter, r *http.Request) {
 
 		}
 	}
-}
-func print_binary(s []byte) {
-	fmt.Printf("Received b:")
-	for n := 0; n < len(s); n++ {
-		fmt.Printf("%c", s[n])
-	}
-	fmt.Printf("\n")
 }
 
 func pickStreamer() string {
