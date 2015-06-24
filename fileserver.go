@@ -6,11 +6,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/ripture/TwitchTimer/lib"
-	"html/template"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"path"
 	"strconv"
 	"time"
 )
@@ -36,8 +34,9 @@ func main() {
 	GetStreams()
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", Twitch)
+	r.Handle("/", http.FileServer(http.Dir("./public")))
 
+	//websocket for requesting more streamers
 	r.HandleFunc("/requestStreamer", requestStreamer)
 
 	fmt.Printf("%v: Starting server on :1935\n", time.Now().Format("15:04:05AM"))
@@ -53,25 +52,23 @@ func requestStreamer(w http.ResponseWriter, r *http.Request) {
 
 	for {
 		messageType, p, err := conn.ReadMessage()
-		_ = messageType
-		_ = p
 		if err != nil {
 			return
 		}
 
 		msg := string(p[:])
-		// fmt.Println(msg)
-		if msg == "requestStreamer" {
-			fmt.Printf("%v: %v - Requests New Streamer\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr())
+		fmt.Println(msg)
 
-			newStreamer := pickStreamer()
+		fmt.Printf("%v: %v - Requests New Streamer\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr())
 
-			fmt.Printf("%v: %v - Returning New Streamer: %v\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr(), newStreamer)
+		newStreamer := pickStreamer()
 
-			err = conn.WriteMessage(messageType, []byte(newStreamer))
-			if err != nil {
-				return
-			}
+		fmt.Printf("%v: %v - Returning New Streamer: %v\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr(), newStreamer)
+
+		err = conn.WriteMessage(messageType, []byte(newStreamer))
+		if err != nil {
+			return
+
 		}
 	}
 }
@@ -83,40 +80,10 @@ func print_binary(s []byte) {
 	fmt.Printf("\n")
 }
 
-func Twitch(w http.ResponseWriter, r *http.Request) {
-	// conn, err := upgrader.Upgrade(w, r, nil)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-	// fmt.Printf("%v: New Connection From %v\n", time.Now().Format("15:04:05AM"), conn.RemoteAddr())
-
-	var ran = rand.Intn(len(StreamerList))
-	ExeTemplate(StreamerList[ran].Name, StreamerList[ran].Viewers, w, r)
-}
-
 func pickStreamer() string {
-	//fmt.Println("Fetching new streamer list...")
 	GetStreams()
 	var ran = rand.Intn(len(StreamerList))
-	//fmt.Println("Fetching " + StreamerList[ran-1].Name)
 	return StreamerList[ran-1].Name
-}
-
-func ExeTemplate(name string, viewers int, w http.ResponseWriter, r *http.Request) {
-	stre := Streamer{name, viewers}
-
-	fp := path.Join("templates", "index.html")
-	tmpl, err := template.ParseFiles(fp)
-
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	if err := tmpl.Execute(w, stre); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
 func GetStreams() forms.StreamS {
