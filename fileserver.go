@@ -6,9 +6,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/ripture/TwitchTimer/lib"
+	"html/template"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"path"
 	"strconv"
 	"time"
 )
@@ -17,25 +19,26 @@ var GameList []forms.Games
 var StreamerList []forms.Streamers
 var timeFormatString = "15:04:05AM"
 
-type Streamer struct {
-	Name    string
-	Viewers int
-}
-
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
+type serverIP struct {
+	Ip string
+}
+
 func main() {
 	//seed random with current time
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	GetStreams()
 	r := mux.NewRouter()
 
-	r.Handle("/", http.FileServer(http.Dir("./public")))
+	r.HandleFunc("/", homeHandler)
+
+	//r.PathPrefix("/public/").Handler(http.FileServer(http.Dir("./public/")))
+	r.PathPrefix("/public/").Handler(http.FileServer(http.Dir(".")))
 
 	//websocket for requesting more streamers
 	r.HandleFunc("/requestStreamer", requestStreamer)
@@ -44,7 +47,57 @@ func main() {
 	http.ListenAndServe(":1935", r)
 }
 
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	ip := getServerIP()
+
+	tmpl, err := template.ParseFiles("index.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = tmpl.Execute(w, ip)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	// http.ServeFile(w, r, ".")
+}
+
+func jsHandler(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "./public/js/main.js")
+}
+
+func getServerIP() serverIP {
+	resp, err := http.Get("http://myexternalip.com/raw")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer resp.Body.Close()
+
+	ip1, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	ip2 := (string(ip1))[:len(string(ip1))-1]
+
+	fmt.Println(ip2)
+
+	ip := serverIP{ip2}
+	return ip
+}
+
+func testHandler(w http.ResponseWriter, r *http.Request) {
+
+	fname := path.Base(r.URL.Path)
+	fmt.Println(r.URL.Path)
+	fmt.Println(fname)
+	http.ServeFile(w, r, "."+r.URL.Path)
+}
+
 func requestStreamer(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("in req")
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println(err)

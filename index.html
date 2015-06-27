@@ -1,0 +1,57 @@
+
+<html>
+  <head>
+    <style>
+      h1 {text-shadow: 2px 2px 4px purple;}
+      body {background: #C8C8C8 no-repeat fixed center;}
+    </style>
+      <script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+      <script>var ip = {{ .Ip }}</script>
+      <script id="mainjs" src="//{{ .Ip }}:1935/public/js/main.js"></script>
+      <script>function test(){var source = $("#mainjs").attr("src");alert(source)}</script>
+  </head>
+  <body onload="fixButtonCSS()" onresize="resize()">
+    <div id="background">
+      <div class="container">
+        <div class="page-title">
+          <h1>Twitch</h1>
+          <div id="streamer">Streamer: nl_Kripp</div>
+          <div>{{ .Ip  }}</div>
+<!--           <form action ="next" method ="POST">
+            <Input type ="submit" value="go" id="go">
+          </form> -->
+          <!-- <button type="button" onclick="pauseTimer()" id="pausebtn">Pause</button> -->
+<!--           <form action="next" method ="POST">
+            <Input type ="submit" value="change" id="change" onclick="changeChannel();">
+          </form> -->
+<!--           <input id="sendtext" type="text" onkeydown="if (event.keyCode == 13) {senddata();}" />-->
+           <input type="button" id="nextButton" value="LOADING NEXT STREAM..." disabled="true" onclick="nextStreamer()" onload="alertt()"></input>
+            <input type="button" id="test" value="test" onclick="test()"></input> 
+         <!--  <div id="timer">20</div> -->
+       <!--  <div id ="testdiv">
+      test things go here
+      </div> -->
+          <hr />
+
+        </div>
+
+
+        <div id="back_player_div" style="position:fixed; padding-left:50px; z-index: -1;">
+      <div id="twitch_player_back">
+
+      </div>
+      </div>
+
+      <div id="front_player_div" style="position:fixed; padding-left:50px; z-index: 1;">
+      <div id="twitch_player_front">
+
+      </div>
+      </div>
+
+
+      
+
+    </div>
+  </body>
+</html>

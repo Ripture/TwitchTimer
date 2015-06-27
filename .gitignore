@@ -44,3 +44,5 @@ Temporary Items
 tests/index.html
 tests/run.bat
 tests/servertest.go
+tests/alert.js
+alert.js
