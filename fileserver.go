@@ -91,7 +91,7 @@ func requestStreamer(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("%v: %v - Requests New Streamer\n", time.Now().Format(timeFormatString), conn.RemoteAddr())
 
 		Streams := forms.GetStreams()
-		newStreamer := Streams.Streams[rand.Intn(len(Streams.Streams)-1)].Channel.Name
+		newStreamer := Streams.Streams[rand.Intn(len(Streams.Streams)-1)].Channel.DisplayName
 
 		fmt.Printf("%v: %v - Returning New Streamer: %v\n", time.Now().Format(timeFormatString), conn.RemoteAddr(), newStreamer)
 
