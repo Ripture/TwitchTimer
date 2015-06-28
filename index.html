@@ -9,7 +9,6 @@
       <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
       <script>var ip = {{ .Ip }}</script>
       <script id="mainjs" src="//{{ .Ip }}:1935/public/js/main.js"></script>
-      <script>function test(){var source = $("#mainjs").attr("src");alert(source)}</script>
   </head>
   <body onload="fixButtonCSS()" onresize="resize()">
     <div id="background">

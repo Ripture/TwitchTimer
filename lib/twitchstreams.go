@@ -1,5 +1,12 @@
 package forms
 
+import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+)
+
 type PreviewS struct {
 	Small    string
 	Medium   string
@@ -78,4 +85,66 @@ type Streamers struct {
 type Games struct {
 	Name    string
 	Viewers int
+}
+
+func GetStreams() StreamS {
+	var SomeStreams StreamS
+	var Streams StreamS
+	var offset int
+
+	baseURL := "https://api.twitch.tv/kraken"
+
+	resp, err := http.Get(baseURL + "/streams?game=Hearthstone%3A+Heroes+of+Warcraft")
+	defer resp.Body.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	err = json.Unmarshal(body, &SomeStreams)
+	if err != nil {
+		panic(err)
+	}
+
+	numt := SomeStreams.Total / 100
+	numm := SomeStreams.Total % 100
+
+	for i := 0; i < SomeStreams.Total/100; i++ {
+		offset = 100 * i
+		resp, err := http.Get(baseURL + "/streams?limit=100&game=Hearthstone%3A+Heroes+of+Warcraft&offset=" + strconv.Itoa(offset))
+		defer resp.Body.Close()
+		if err != nil {
+			panic(err)
+		}
+
+		body, err := ioutil.ReadAll(resp.Body)
+
+		err = json.Unmarshal(body, &SomeStreams)
+		if err != nil {
+			panic(err)
+		}
+
+		Streams.Streams = append(Streams.Streams, SomeStreams.Streams...)
+	}
+
+	offset = numt * 100
+
+	if numm > 0 { //if there are any remaining streams to get
+		resp, err := http.Get(baseURL + "/streams?limit=" + strconv.Itoa(numm) + "&game=Hearthstone%3A+Heroes+of+Warcraft&offset=" + strconv.Itoa(offset))
+		if err != nil {
+			panic(err)
+		}
+
+		body, err := ioutil.ReadAll(resp.Body)
+
+		err = json.Unmarshal(body, &SomeStreams)
+		if err != nil {
+			panic(err)
+		}
+
+		Streams.Streams = append(Streams.Streams, SomeStreams.Streams...)
+	}
+
+	return Streams
 }
