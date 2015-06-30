@@ -9,8 +9,8 @@
       <script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
       <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
       <script>
-        var ip = {{ .Ip }}
-        var port = {{ .Port }}
+        var ip = {{ .Ip }};
+        var port = {{ .Port }};
       </script>
       <script id="mainjs" src="//{{ .Ip }}:{{ .Port }}/public/js/main.js"></script>
       <script>function test() {alert($("#twitch_player").attr("width", 800))}</script>

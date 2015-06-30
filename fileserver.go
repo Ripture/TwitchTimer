@@ -44,12 +44,19 @@ func main() {
 	//websocket for requesting more streamers
 	r.HandleFunc("/requestStreamer", requestStreamer)
 
-	fmt.Printf("%v: Starting server on :1935\n", time.Now().Format(timeFormatString))
+	fmt.Printf("%v: Starting server on :"+port+"\n", time.Now().Format(timeFormatString))
 	http.ListenAndServe(":"+port, r)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	ip := getServerIP()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "1935"
+	}
+
+	ip.Port = port
 
 	tmpl, err := template.ParseFiles("index.html")
 	if err != nil {
@@ -61,6 +68,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 }
 
 func getServerIP() serverIP {
@@ -77,7 +85,7 @@ func getServerIP() serverIP {
 
 	ip2 := (string(ip1))[:len(string(ip1))-1]
 
-	ip := serverIP{ip2}
+	ip := serverIP{ip2, ""}
 	return ip
 }
 

@@ -27,7 +27,7 @@ var counting
 var paused = false
 var frontontop = true
 
-var serversocket = new WebSocket ("ws://" + ip + ":" + port "/requestStreamer");
+var serversocket = new WebSocket ("ws://" + ip + ":" + port + "/requestStreamer");
 serversocket.onmessage = function(e) {
   $("#twitch_player").empty()
   createPlayer(e.data, "twitch_player")
