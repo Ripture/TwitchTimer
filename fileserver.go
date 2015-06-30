@@ -26,6 +26,11 @@ type serverIP struct {
 }
 
 func main() {
+	port: := os.Getenv("PORT")
+	if port == "" {
+		port = "1935"
+	}
+
 	//seed random with current time
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -39,7 +44,7 @@ func main() {
 	r.HandleFunc("/requestStreamer", requestStreamer)
 
 	fmt.Printf("%v: Starting server on :1935\n", time.Now().Format(timeFormatString))
-	http.ListenAndServe(":1935", r)
+	http.ListenAndServe(":" + port, r)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
