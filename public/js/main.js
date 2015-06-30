@@ -26,7 +26,7 @@ var counter = 20
 var counting
 var paused = false
 var frontontop = true
-alert (ip)
+
 var serversocket = new WebSocket ("ws://safe-fortress-3054.herokuapp.com/requestStreamer");
 serversocket.onmessage = function(e) {
   $("#twitch_player").empty()
@@ -35,6 +35,7 @@ serversocket.onmessage = function(e) {
 }
 serversocket.onopen = function(e) {
   //socket is now opened, get initial streamer
+  alert("te")
   getStreamer()
 }
 
