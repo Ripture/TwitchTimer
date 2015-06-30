@@ -12,7 +12,7 @@
         var ip = {{ .Ip }};
         var port = {{ .Port }};
       </script>
-      <script id="mainjs" src="//{{ .Ip }}:{{ .Port }}/public/js/main.js"></script>
+      <script id="mainjs" src="/public/js/main.js"></script>
       <script>function test() {alert($("#twitch_player").attr("width", 800))}</script>
   </head>
   <body onload="fixButtonCSS()" onresize="resize()">
