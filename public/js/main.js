@@ -28,6 +28,7 @@ var paused = false
 var frontontop = true
 
 var serversocket = new WebSocket ("ws://safe-fortress-3054.herokuapp.com/requestStreamer");
+ console.log("trying to open websocket");
 serversocket.onmessage = function(e) {
   $("#twitch_player").empty()
   createPlayer(e.data, "twitch_player")
@@ -35,8 +36,12 @@ serversocket.onmessage = function(e) {
 }
 serversocket.onopen = function(e) {
   //socket is now opened, get initial streamer
-  alert("te")
+
   getStreamer()
+}
+
+serversocket.onerror = function(e){
+    console.log("The following error occurred: " + evt.data);
 }
 
 function getStreamer(){
