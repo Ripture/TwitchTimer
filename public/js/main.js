@@ -26,7 +26,7 @@ var counter = 20
 var counting
 var paused = false
 var frontontop = true
-
+alert (ip)
 var serversocket = new WebSocket ("ws://" + ip + "/requestStreamer");
 serversocket.onmessage = function(e) {
   $("#twitch_player").empty()
