@@ -28,7 +28,7 @@ var paused = false
 var frontontop = true
 
 var host = location.origin.replace(/^http/, 'ws')
-
+host += "/requestStreamer"
 var serversocket = new WebSocket (host);
 serversocket.onmessage = function(e) {
   $("#twitch_player").empty()
@@ -37,7 +37,6 @@ serversocket.onmessage = function(e) {
 }
 serversocket.onopen = function(e) {
   //socket is now opened, get initial streamer
- alert("SOCKEST OPEN")
   getStreamer()
 }
 
