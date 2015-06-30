@@ -22,7 +22,8 @@ var upgrader = websocket.Upgrader{
 }
 
 type serverIP struct {
-	Ip string
+	Ip   string
+	Port string
 }
 
 func main() {
