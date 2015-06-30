@@ -27,8 +27,9 @@ var counting
 var paused = false
 var frontontop = true
 
-var serversocket = new WebSocket ("ws://safe-fortress-3054.herokuapp.com/requestStreamer");
- console.log("trying to open websocket");
+var host = location.origin.replace(/^http/, 'ws')
+
+var serversocket = new WebSocket (host);
 serversocket.onmessage = function(e) {
   $("#twitch_player").empty()
   createPlayer(e.data, "twitch_player")
@@ -36,7 +37,7 @@ serversocket.onmessage = function(e) {
 }
 serversocket.onopen = function(e) {
   //socket is now opened, get initial streamer
-
+ alert("SOCKEST OPEN")
   getStreamer()
 }
 
